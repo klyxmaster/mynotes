@@ -1,0 +1,15 @@
+/config.php
+/smtp.php
+/storage/*
+!/storage/.htaccess
+/vendor/
+/error_log
+/error_log.*
+*.log
+.env
+.env.*
+!.env.example
+*.bak
+*.backup
+*.zip
+*.sql.gz

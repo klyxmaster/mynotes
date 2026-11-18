@@ -90,3 +90,62 @@ document.getElementById('deleteNote')?.addEventListener('click', () => {
     form.querySelector('[name="action"]').value = 'trash';
     form.requestSubmit();
 });
+
+
+/* Select individual notes for bulk category assignment or trash. */
+document.getElementById('bulkSlot')?.append(document.getElementById('bulkBar'));
+const bulkSelected = new Set();
+const bulkBar = document.getElementById('bulkBar');
+const bulkIds = document.getElementById('bulkIds');
+const bulkAction = document.getElementById('bulkAction');
+const bulkCategory = document.getElementById('bulkCategory');
+function refreshBulkSelection() {
+    document.querySelectorAll('.note[data-note-id]').forEach(note => {
+        const active = bulkSelected.has(note.dataset.noteId);
+        note.classList.toggle('is-selected', active);
+        const btn = note.querySelector('.select-note');
+        if (btn) { btn.textContent = active ? '✓' : '+'; btn.setAttribute('aria-pressed', String(active)); btn.title = active ? 'Deselect note' : 'Select note'; }
+    });
+    if (bulkBar) bulkBar.hidden = bulkSelected.size === 0;
+	const normalCategories = document.getElementById('normalCategories');
+	if (normalCategories) normalCategories.hidden = bulkSelected.size > 0;
+    const count = document.getElementById('bulkCount');
+    if (count) count.textContent = bulkSelected.size + (bulkSelected.size === 1 ? ' selected' : ' selected');
+    if (bulkIds) bulkIds.value = [...bulkSelected].join(',');
+}
+document.querySelectorAll('.note .select-note').forEach(btn => btn.addEventListener('click', () => {
+    const id = btn.closest('.note').dataset.noteId;
+    if (bulkSelected.has(id)) bulkSelected.delete(id); else bulkSelected.add(id);
+    refreshBulkSelection();
+}));
+document.getElementById('bulkClear')?.addEventListener('click', () => { bulkSelected.clear(); refreshBulkSelection(); });
+document.getElementById('bulkMove')?.addEventListener('click', () => {
+    const newCategory = document.getElementById('bulkNewCategory')?.value.trim() || '';
+		if (!bulkSelected.size || (!newCategory && (!bulkCategory || bulkCategory.value === ''))) {
+			alert('Choose an existing category or enter a new category name.');
+			return;
+		}
+    bulkAction.value = 'category';
+    rememberScroll();
+    bulkBar.requestSubmit();
+});
+document.getElementById('bulkTrash')?.addEventListener('click', () => {
+    if (!bulkSelected.size) return;
+    if (!confirm('Move ' + bulkSelected.size + ' selected notes to Trash?')) return;
+    bulkAction.value = 'trash';
+    rememberScroll();
+    bulkBar.requestSubmit();
+});
+/* Drag the bulk toolbar using its selection count. */
+document.getElementById('bulkArchive')?.addEventListener('click', () => {
+    if (!bulkSelected.size) return;
+    if (!confirm('Archive ' + bulkSelected.size + ' selected notes?')) return;
+    bulkAction.value = 'archive';
+    rememberScroll();
+    bulkBar.requestSubmit();
+});
+document.getElementById('emptyTrashForm')?.addEventListener('submit', function(e) {
+    if (!confirm('Permanently delete ALL notes in Trash? This cannot be undone.')) {
+        e.preventDefault();
+    }
+});

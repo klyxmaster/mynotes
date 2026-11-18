@@ -59,3 +59,62 @@
     margin-right: auto;
 }
 
+/* Bulk actions in sidebar */
+#bulkSlot {
+    margin-top: 18px;
+}
+
+#bulkBar {
+    position: static !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #272a30;
+    gap: 8px;
+}
+
+#bulkBar[hidden] {
+    display: none !important;
+}
+
+#bulkCount {
+    cursor: default !important;
+    background: transparent;
+    padding: 0;
+}
+
+.bulk-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.bulk-buttons button {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 3px;
+    font-size: 11px;
+}
+
+#bulkClear {
+    background: #484b54;
+    color: white;
+    padding: 7px;
+    font-size: 12px;
+}
+#normalCategories[hidden] {
+    display: none !important;
+}
+
+#bulkNewCategory {
+    width: 100%;
+    font-size: 12px;
+    padding: 9px;
+}

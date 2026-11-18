@@ -1,2 +1,24 @@
-/storage/*
-!/storage/.gitkeep
+
+# Private configuration
+/config.php
+/smtp.php
+
+# User data and uploaded attachments
+/storage/
+
+# Local environment files
+/.env
+/.env.*
+/vendor/
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.zip
+
+# Editor files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
