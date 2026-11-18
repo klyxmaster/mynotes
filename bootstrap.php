@@ -25,3 +25,24 @@ function safe_cat(int $id,int $user):?int{if(!$id)return null;$v=q('SELECT id FR
 function getcat(int $user,string $name,?int $parent=null):?int{$name=trim($name);if($name==='')return $parent;if(mb_strlen($name)>160)throw new RuntimeException('Category too long');$s=q('SELECT id FROM mn_categories WHERE user_id=? AND name=? AND parent_id <=> ? LIMIT 1',[$user,$name,$parent]);$id=$s->fetchColumn();if($id)return (int)$id;q('INSERT INTO mn_categories(user_id,parent_id,name) VALUES(?,?,?)',[$user,$parent,$name]);return (int)db()->lastInsertId();}
 function set_tags(int $user,int $note,string $raw):void{q('DELETE FROM mn_note_tags WHERE note_id=?',[$note]);foreach(array_unique(array_filter(array_map('trim',explode(',',$raw)))) as $tag){if(mb_strlen($tag)>160)continue;q('INSERT IGNORE INTO mn_tags(user_id,name) VALUES(?,?)',[$user,$tag]);$id=q('SELECT id FROM mn_tags WHERE user_id=? AND name=?',[$user,$tag])->fetchColumn();q('INSERT IGNORE INTO mn_note_tags(note_id,tag_id) VALUES(?,?)',[$note,$id]);}}
 function tags_for(int $note):string{return implode(', ',q('SELECT t.name FROM mn_tags t JOIN mn_note_tags nt ON nt.tag_id=t.id WHERE nt.note_id=? ORDER BY t.name',[$note])->fetchAll(PDO::FETCH_COLUMN));}
+
+function mn_finish_login(array $user):void {
+    session_regenerate_id(true);
+    $_SESSION['uid']=(int)$user['id'];
+    $_SESSION['admin']=(bool)$user['is_admin'];
+    $_SESSION['last_active']=time();
+    unset($_SESSION['pending_user'],$_SESSION['pending_purpose'],$_SESSION['login_failures']);
+}
+function mn_trusted_browser(int $user):bool {
+    $cookie=(string)($_COOKIE['mn_trusted']??'');
+    if(!preg_match('/^[a-f0-9]{32}:[a-f0-9]{64}$/D',$cookie))return false;
+    [$selector,$token]=explode(':',$cookie,2);
+    $r=q('SELECT token_hash FROM mn_trusted_browsers WHERE selector=? AND user_id=? AND expires_at>NOW()',[$selector,$user])->fetch();
+    return $r && hash_equals($r['token_hash'],hash('sha256',$token));
+}
+function mn_remember_browser(int $user):void {
+    $selector=bin2hex(random_bytes(16));$token=bin2hex(random_bytes(32));
+    q('DELETE FROM mn_trusted_browsers WHERE user_id=? AND expires_at<=NOW()',[$user]);
+    q('INSERT INTO mn_trusted_browsers(user_id,selector,token_hash,expires_at) VALUES(?,?,?,DATE_ADD(NOW(),INTERVAL 30 DAY))',[$user,$selector,hash('sha256',$token)]);
+    setcookie('mn_trusted',$selector.':'.$token,['expires'=>time()+30*86400,'path'=>'/MyNotes/','secure'=>true,'httponly'=>true,'samesite'=>'Lax']);
+}

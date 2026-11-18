@@ -1,0 +1,13 @@
+MyNotes login upgrade
+
+1. BACK UP your current MyNotes database and PHP files first.
+2. In phpMyAdmin select the existing MyNotes database and run upgrade.sql ONCE.
+3. Upload bootstrap.php, login.php and admin/index.php to their matching paths in MyNotes.
+4. Do not replace your existing database with schema.sql. schema.sql is updated for fresh installations and GitHub.
+5. Visit login.php and select "First time here? Set up your password". Enter your already-approved email and use the emailed code to establish a password.
+6. Sign in with your email and password. A six-digit code will verify your browser and remember it for 30 days.
+7. In Admin > Settings, uncheck the six-digit verification option if you wish to disable it.
+
+Existing approved-email management is unchanged. New users added in Admin use the same first-time password setup.
+IMPORTANT: Keep config.php and smtp.php private and excluded from Git. Commit only example/dist configuration files.
+NOTE: Existing accounts with password_hash set must have their passwords reset administratively; the first-time setup is deliberately not a password-reset bypass.
