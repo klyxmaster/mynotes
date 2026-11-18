@@ -73,7 +73,7 @@ if(!empty($_SESSION['setup_verified_user']))$mode='password';
 <?php if($error):?><p class="error"><?=h($error)?></p><?php endif;?>
 <?php if($mode==='login'):?>
 <form method="post"><input type="hidden" name="csrf" value="<?=h(csrf())?>"><input type="hidden" name="action" value="login"><label>Email</label><input type="email" name="email" autocomplete="username" required><label>Password</label><input type="password" name="password" autocomplete="current-password" required><button>Sign in</button></form>
-<details><summary>First time here? Set up your password</summary><form method="post"><input type="hidden" name="csrf" value="<?=h(csrf())?>"><input type="hidden" name="action" value="setup"><label>Approved email address</label><input type="email" name="email" required><button>Send setup code</button></form></details>
+
 <?php elseif($mode==='verify'):?>
 <form method="post"><input type="hidden" name="csrf" value="<?=h(csrf())?>"><input type="hidden" name="action" value="verify"><label>Six-digit email code</label><input name="code" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" autocomplete="one-time-code" required><button>Verify</button></form><p><a href="login.php?restart=1">Start again</a></p>
 <?php elseif($mode==='password'):?>
